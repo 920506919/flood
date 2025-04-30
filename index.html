@@ -188,8 +188,6 @@
       // 检测并创建
       images.forEach(o => {
         const tester = new Image();
-        tester.onload  = () => console.log(`✅ 图片加载成功: ${o.path}`);
-        tester.onerror = () => console.error(`❌ 图片加载失败: ${o.path}`);
         tester.src     = o.path;
         createPhotoWall(o.lon, o.lat, o.path, o.name);
       });

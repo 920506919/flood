@@ -160,9 +160,9 @@
 
       // 照片墙数据与创建函数
       const images = [
-        { name: 'Train Station', path: '../Apps/SampleData/2024trainstation.png', lon: 113.0057506, lat: 28.1960111 },
-        { name: 'Orange Island',   path: '../Apps/SampleData/橘子洲头.png',      lon: 112.9545,      lat: 28.1695    },
-        { name: 'Xiyimen',         path: '../Apps/SampleData/喜盈门.png',      lon: 113.0285,      lat: 28.1360    }
+        { name: 'Train Station', path: './Apps/SampleData/2024trainstation.png', lon: 113.0057506, lat: 28.1960111 },
+        { name: 'Orange Island',   path: './Apps/SampleData/橘子洲头.png',      lon: 112.9545,      lat: 28.1695    },
+        { name: 'Xiyimen',         path: './Apps/SampleData/喜盈门.png',      lon: 113.0285,      lat: 28.1360    }
       ];
       const baseH = 5, wallH = 200, meters = 400, earthR = 6378137.0;
       function createPhotoWall(lon, lat, img, id) {
@@ -203,7 +203,7 @@
       if (currentDataSource) {
         viewer.dataSources.remove(currentDataSource);
       }
-      Cesium.GeoJsonDataSource.load('../Apps/SampleData/' + file)
+      Cesium.GeoJsonDataSource.load('./Apps/SampleData/' + file)
         .then(ds => {
           currentDataSource = ds;
           viewer.dataSources.add(ds);

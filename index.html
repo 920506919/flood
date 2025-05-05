@@ -4,89 +4,214 @@
   <meta charset="UTF-8"/>
   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Earth & Photo Wall Viewer</title>
+  <title>三维水体可视化系统（时间轴）</title>
 
-  <!-- Cesium 静态资源设置 -->
-<script>window.CESIUM_BASE_URL = "./Build/CesiumUnminified";</script>
-<script src="./public/Build/CesiumUnminified/Cesium.js"></script>
-<link rel="stylesheet" href="./public/Build/CesiumUnminified/Widgets/widgets.css">
-
+  <!-- Cesium 依赖 -->
+  <script>window.CESIUM_BASE_URL = '../Build/CesiumUnminified';</script>
+  <link rel="stylesheet" href="../Build/CesiumUnminified/Widgets/widgets.css"/>
+  <script src="../Build/CesiumUnminified/Cesium.js"></script>
 
   <style>
     html, body {
       margin: 0; padding: 0;
       width: 100%; height: 100%;
-      font-family: Arial, sans-serif;
       overflow: hidden;
+      font-family: Microsoft YaHei, sans-serif;
     }
-    /* 登录界面 */
+    
+    /* 登录界面样式 */
     #login-container {
       position: absolute;
       width: 100%; height: 100%;
       background: linear-gradient(to bottom, #222, #444);
-      display: flex; justify-content: center; align-items: center;
-      color: white; z-index: 20;
+      display: flex; 
+      justify-content: center; 
+      align-items: center;
+      z-index: 9999;
     }
+    
     #login-box {
-      background: rgba(0,0,0,0.6);
-      padding: 40px; border-radius: 10px;
-      box-shadow: 0 0 10px black; text-align: center;
+      background: rgba(0,0,0,0.7);
+      padding: 30px 40px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      text-align: center;
+      width: 300px;
     }
+    
+    #login-box h2 {
+      color: #fff;
+      margin-bottom: 20px;
+    }
+    
     #login-box input {
-      display: block; width: 200px; margin: 10px auto;
-      padding: 8px; border-radius: 5px; border: none;
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      background: rgba(255,255,255,0.9);
     }
+    
     #login-box button {
-      padding: 10px 20px; background: #2d8fd3;
-      color: white; border: none; border-radius: 5px;
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      background: #2d8fd3;
+      color: white;
+      border: none;
+      border-radius: 5px;
       cursor: pointer;
+      transition: background 0.3s;
     }
-
-    /* Cesium 容器 */
+    
+    #login-box button:hover {
+      background: #1a7bb9;
+    }
+    
+    /* 主界面样式 */
     #cesiumContainer {
-      width: 100%; height: 100%;
-      display: none; position: relative; z-index: 10;
+      display: none;
+      width: 100%;
+      height: 100%;
     }
-    /* 年份选择器 */
-    #yearSelector {
-      position: absolute; top: 10px; left: 10px;
-      z-index: 100; padding: 6px 12px; border-radius: 5px;
-      background: rgba(255,255,255,0.9); font-size: 16px;
+    
+    #timeSliderContainer {
+      position: absolute;
+      bottom: 20px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      background: rgba(40, 40, 40, 0.8);
+      padding: 12px 20px;
+      border-radius: 4px;
+      color: white;
+      width: 400px;
+    }
+    
+    #timeSlider {
+      width: 320px;
+    }
+    
+    #timeLabel {
+      margin-left: 8px;
+    }
+    
+    #playButton {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-left: 10px;
+    }
+    
+    #playButton:hover {
+      background: rgba(255,255,255,0.3);
     }
   </style>
 </head>
 <body>
-
   <!-- 登录界面 -->
   <div id="login-container">
     <div id="login-box">
-      <h2>登录地球系统</h2>
+      <h2>三维水体可视化系统</h2>
       <input type="text" id="username" placeholder="用户名" value="admin"/>
       <input type="password" id="password" placeholder="密码" value="admin"/>
-      <button onclick="login()">登录</button>
+      <button onclick="login()">登 录</button>
     </div>
   </div>
-
-  <!-- Cesium 容器 -->
-  <div id="cesiumContainer">
-    <select id="yearSelector" onchange="switchData()">
-      <option value="output1.geojson">2021年数据</option>
-      <option value="output4.geojson">2024年数据</option>
-      <option value="output.geojson" selected>预测数据</option>
-    </select>
+  
+  <!-- 主界面 -->
+  <div id="cesiumContainer"></div>
+  <div id="timeSliderContainer">
+    <input type="range" id="timeSlider" min="0" max="2" step="1" value="1" oninput="onSliderChange(this.value)" />
+    <span id="timeLabel">2024年水域</span>
+    <button id="playButton">▶</button>
   </div>
 
   <script>
-    // Cesium 访问 Token
-    const CESIUM_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0NTNiZTdhZS1iMDE0LTQ0NzMtYWY0Ny04YjI5NTYwN2YzZjciLCJpZCI6Mjg1ODk4LCJpYXQiOjE3NDI0MzIyODV9.a8VuYB5zSzRQZS9OA1UwqbcH7lgV49Sz_GPVQIl2GxQ';
+    // 配置参数
+    const CESIUM_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI3NGY1M2M1Zi03OGM0LTQ5MDMtYjdkNC05NjYzNDJiYTE3NTkiLCJpZCI6Mjk4MjU2LCJpYXQiOjE3NDU5MjM3Nzd9.oro-DOfGEuycvInrWfaEpSGGrR0qOyweR5736VMLBQs';
+    const TILESET_ASSET_ID = 3342493;
+    const CHANGSHA_POSITION = Cesium.Cartesian3.fromDegrees(112.98, 28.1858, 5000);
+    
+    // 数据配置
+    const dataFiles = [
+  { label: '2021年水域', file: 'output1.geojson' },
+  { label: '2024年水域', file: 'output4.geojson' },
+  { label: '预测数据', file: 'predict_1.geojson' }
+];
 
-    let viewer, currentDataSource;
+// 照片墙数据与函数定义
+    const images = [
+      { name: 'Train Station', path: '../Apps/SampleData/2024trainstation.png', lon: 113.0057506, lat: 28.1960111 },
+      { name: 'Orange Island',   path: '../Apps/SampleData/橘子洲.jpg',      lon: 112.9545,      lat: 28.1695    },
+      { name: 'Xiyimen',         path: '../Apps/SampleData/喜盈门.png',      lon: 113.0285,      lat: 28.1360    },
+      { name: 'Orange squer',   path: '../Apps/SampleData/1东方红广场.jpg',      lon: 112.9418,      lat: 28.1794    },
+      { name: '农大',   path: '../Apps/SampleData/1湖南农业大学红旗广场.jpg',      lon: 113.0819,      lat: 28.18128    },
+      { name: 'shidaiyangguang',   path: '../Apps/SampleData/01雨花区时代阳光大道158号.jpg',      lon: 113.02047,      lat: 28.09591   },
+      { name: '金盆岭',   path: '../Apps/SampleData/01长沙理工大学金盆岭校区东苑游泳池.jpg',      lon: 112.9669,      lat: 28.167   },
+      { name: '汽车南站',   path: '../Apps/SampleData/1长沙汽车南站.jpg',      lon: 113.0128,      lat: 28.09722   },
+      { name: '汽车南站1',   path: '../Apps/SampleData/1长沙汽车南站2.jpg',      lon: 113.0100,      lat: 28.09480    },
+      { name: '植物园路',   path: '../Apps/SampleData/1植物园路.jpg',      lon: 113.0217,      lat: 28.10328   },
+      { name: 'xiangya',   path: '../Apps/SampleData/1中南大学湘雅二医院.jpg',      lon: 112.99451,      lat: 28.1879   },
+      { name: 'linkeda',   path: '../Apps/SampleData/1中南林科大.2.jpg',      lon: 112.99480,      lat: 28.13293    },
+      { name: 'linkeda2',   path: '../Apps/SampleData/1中南林科大.jpg',      lon: 112.98954,      lat: 28.12996   },
+      { name: 'fenghuanghai',   path: '../Apps/SampleData/01hi park凤凰海购物公园.jpg',      lon: 112.98096,      lat: 28.23677   },
+      { name: 'datang',   path: '../Apps/SampleData/大塘站.jpg',      lon: 113.03437,      lat: 28.13100   },
+      { name: 'guitanghe',   path: '../Apps/SampleData/圭塘河.jpg',      lon: 113.0321,      lat: 28.13544   },
+      { name: 'hanpu',   path: '../Apps/SampleData/含浦.jpg',      lon: 112.92125,      lat: 28.16256    },
+      { name: 'meixihu',   path: '../Apps/SampleData/梅溪湖.jpg',      lon: 112.89706,      lat: 28.19014    },
+      { name: 'shewai2',   path: '../Apps/SampleData/涉外1.jpg',      lon: 112.87553,      lat: 28.24999   },
+      { name: 'shumuling',   path: '../Apps/SampleData/树木岭立交桥.jpg',      lon: 113.01351,      lat: 28.15590   },
+      { name: 'tiedaoxueyuan',   path: '../Apps/SampleData/铁道学院.jpg',      lon: 112.99024,      lat: 28.13970   },
+      { name: 'yuhuaquzhengfu',   path: '../Apps/SampleData/万家丽路口.jpg',      lon: 113.03309,      lat: 28.13752   },
+      { name: 'xiyuehui',   path: '../Apps/SampleData/溪悦荟.jpg',      lon: 113.02886,      lat: 28.14444   },
+      { name: 'youyouxiaozheng',   path: '../Apps/SampleData/悠游小镇.jpg',      lon: 113.03262,      lat: 28.13006   },
+      { name: 'bingjianggongyuan',   path: '../Apps/SampleData/长沙春晚舞台.jpg',      lon: 112.97749,      lat: 28.24175   },
+      { name: 'huochezhan',   path: '../Apps/SampleData/长沙火车站.jpg',      lon: 113.00900,      lat: 28.19530   },
+      { name: 'zhongnan',   path: '../Apps/SampleData/中南大1.jpg',      lon: 112.92464,      lat: 28.16772   },
+      { name: 'zhongnan1',   path: '../Apps/SampleData/中南大学.jpg',      lon: 112.92796,      lat: 28.17211   },
+      { name: 'zhongnan2',   path: '../Apps/SampleData/中南大学2.jpg',      lon: 112.93475,      lat: 28.16021   },
+      { name: 'zhongnan3',   path: '../Apps/SampleData/中南大学3.jpg',      lon: 112.93774,      lat: 28.15048   }
+    ];
+    const baseH = 10, wallH = 300, meters = 500, earthR = 6378137.0;
+    function createPhotoWall(lon, lat, img, id) {
+      const dLon = meters / (earthR * Math.cos(Cesium.Math.toRadians(lat))) * (180/Math.PI);
+      const wLon = lon - dLon/2, eLon = lon + dLon/2;
+      const pos = Cesium.Cartesian3.fromDegreesArrayHeights([
+        wLon, lat, baseH, eLon, lat, baseH
+      ]);
+      viewer.entities.add({
+        name: id,
+        wall: {
+          positions: pos,
+          minimumHeights: [baseH, baseH],
+          maximumHeights: [baseH+wallH, baseH+wallH],
+          material: new Cesium.ImageMaterialProperty({
+            image: img,
+            repeat: new Cesium.Cartesian2(1,1),
+            transparent: true
+          })
+        }
+      });
+    }       
+    // 系统参数
+    const fadeDuration = 1000;
+    const playInterval = 2000;
+    let viewer;
+    let currentPrimitive = null;
+    let autoPlayTimer = null;
+    let isPlaying = false;
 
-    // 登录验证
+    // 登录函数
     function login() {
-      const user = document.getElementById('username').value;
-      const pass = document.getElementById('password').value;
-      if (user === 'admin' && pass === 'admin') {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      
+      if(username === 'admin' && password === 'admin') {
         document.getElementById('login-container').style.display = 'none';
         document.getElementById('cesiumContainer').style.display = 'block';
         initCesium();
@@ -95,124 +220,218 @@
       }
     }
 
-    // 初始化 Cesium 场景
-    function initCesium() {
-      Cesium.Ion.defaultAccessToken = CESIUM_TOKEN;
-      viewer = new Cesium.Viewer('cesiumContainer', {
-        animation: false, timeline: false,
-        sceneModePicker: true, navigationHelpButton: true,
-        fullscreenButton: true, geocoder: true, homeButton: true,
-        infoBox: true, selectionIndicator: true,
-        baseLayerPicker: true,
-        terrainProvider: new Cesium.EllipsoidTerrainProvider()
-      });
+    async function initCesium() {
+      
+      try {
+        // 初始化Cesium
+        Cesium.Ion.defaultAccessToken = CESIUM_TOKEN;
 
-      // 异步加载 Ion 地形
-      Cesium.CesiumTerrainProvider.fromIonAssetId(1)
-        .then(tp => { viewer.terrainProvider = tp; console.log('地形加载成功'); });
+        viewer = new Cesium.Viewer('cesiumContainer', {
+          baseLayerPicker: false,
+          animation: false,
+          timeline: false,
+          infoBox: false,
+          fullscreenButton: true,
+          geocoder: true,
+          sceneModePicker: true
+        });
 
-      // 自转效果
-      let spinning = true;
-      viewer.scene.preRender.addEventListener(() => {
-        if (spinning) {
-          viewer.scene.camera.rotate(Cesium.Cartesian3.UNIT_Z, -0.002);
-        }
-      });
-
-      // 初始漫游：3 秒后停止自转并飞到指定位置
-      setTimeout(() => {
-        spinning = false;
-        viewer.camera.flyTo({
-          destination: Cesium.Cartesian3.fromDegrees(112.98, 28.1858, 15000),
-          duration: 5,
+        // 初始状态：完整地球视图
+        viewer.camera.setView({
+          destination: Cesium.Cartesian3.fromDegrees(0, 0, 25000000), // 从太空看地球
           orientation: {
-            heading: Cesium.Math.toRadians(0),
-            pitch:   Cesium.Math.toRadians(-30),
-            roll:    0
-          },
-          complete: () => {
-            viewer.camera.flyTo({
-              destination: Cesium.Cartesian3.fromDegrees(112.98, 28.1858, 5000),
-              duration: 3
-            });
+            heading: 0,
+            pitch: -Cesium.Math.PI/2, // 垂直向下看
+            roll: 0
           }
         });
-      }, 3000);
 
-      // 动态水流线
-      const waterFlow = viewer.entities.add({
-        polyline: {
-          positions: [
-            Cesium.Cartesian3.fromDegrees(112.9388, 28.2278),
-            Cesium.Cartesian3.fromDegrees(112.94,   28.2290)
-          ],
-          width: 5,
-          material: Cesium.Color.BLUE.withAlpha(0.6)
+        // 地球自转效果
+        let spinning = true;
+        viewer.scene.preRender.addEventListener(() => {
+          if (spinning) {
+            viewer.scene.camera.rotate(Cesium.Cartesian3.UNIT_Z, -0.002);
+          }
+        });
+
+        // 加载3D Tiles模型
+        const tileset = await Cesium.Cesium3DTileset.fromIonAssetId(TILESET_ASSET_ID);
+        viewer.scene.primitives.add(tileset);
+
+        // 3秒后停止自转并飞向长沙
+        setTimeout(() => {
+          spinning = false;
+          viewer.camera.flyTo({
+            destination: Cesium.Cartesian3.fromDegrees(112.98, 28.1858, 15000),
+            duration: 1,
+            orientation: {
+              heading: Cesium.Math.toRadians(0),
+              pitch: Cesium.Math.toRadians(-30),
+              roll: 0
+            },
+            complete: function() {
+              // 到达后加载初始水域数据
+              loadAndFade(dataFiles[1].file);
+              
+              // 再稍微降低视角
+              viewer.camera.flyTo({
+                destination: CHANGSHA_POSITION,
+                duration: 2
+              });
+              images.forEach(o => {
+              const tester = new Image();
+              tester.onload  = () => console.log(`✅ 图片加载成功: ${o.path}`);
+              tester.onerror = () => console.error(`❌ 图片加载失败: ${o.path}`);
+              tester.src     = o.path;
+              createPhotoWall(o.lon, o.lat, o.path, o.name);
+            });
+            }
+          });
+        }, 3000);
+
+      } catch (error) {
+        console.error('初始化失败:', error);
+      }
+    }
+
+    // 其余函数保持不变（loadAndFade, createWaterPrimitive, onSliderChange等）
+    async function loadAndFade(filename) {
+      try {
+        const response = await fetch(`../Apps/SampleData/${filename}`);
+        const geojson = await response.json();
+        
+        const newPrim = createWaterPrimitive(geojson);
+        newPrim.appearance.material.uniforms.baseWaterColor.alpha = 0.0;
+        viewer.scene.primitives.add(newPrim);
+
+        const start = performance.now();
+        const animate = () => {
+          const elapsed = performance.now() - start;
+          const t = Math.min(elapsed / fadeDuration, 1);
+          
+          newPrim.appearance.material.uniforms.baseWaterColor.alpha = t * 0.9;
+          if (currentPrimitive) {
+            currentPrimitive.appearance.material.uniforms.baseWaterColor.alpha = (1 - t) * 0.9;
+          }
+
+          if (t < 1) {
+            requestAnimationFrame(animate);
+          } else {
+            if (currentPrimitive) {
+              viewer.scene.primitives.remove(currentPrimitive);
+            }
+            currentPrimitive = newPrim;
+          }
+        };
+        requestAnimationFrame(animate);
+      } catch (error) {
+        console.error('数据加载失败:', error);
+      }
+    }
+
+    function createWaterPrimitive(geojson) {
+      const instances = [];
+      
+      geojson.features.forEach(feat => {
+        if (feat.properties.gridcode === 1) {
+          const coords = [];
+          const geom = feat.geometry;
+
+          if (geom.type === 'MultiPolygon') {
+            geom.coordinates.forEach(poly => {
+              poly[0].forEach(c => coords.push(c[0], c[1]));
+            });
+          } else {
+            geom.coordinates[0].forEach(c => coords.push(c[0], c[1]));
+          }
+
+          instances.push(new Cesium.GeometryInstance({
+            geometry: new Cesium.PolygonGeometry({
+              polygonHierarchy: new Cesium.PolygonHierarchy(
+                Cesium.Cartesian3.fromDegreesArray(coords)
+              ),
+              height: 0,
+              extrudedHeight: 0
+            }),
+            id: 'waterBody'
+          }));
         }
       });
-      let t = 0;
-      viewer.scene.preRender.addEventListener(() => {
-        waterFlow.polyline.material = Cesium.Color.fromAlpha(
-          Cesium.Color.BLUE,
-          0.6 + Math.sin(t * 0.05) * 0.2
-        );
-        t++;
+
+      return new Cesium.Primitive({
+        geometryInstances: instances,
+        appearance: new Cesium.EllipsoidSurfaceAppearance({
+          material: new Cesium.Material({
+            fabric: {
+              type: 'Water',
+              uniforms: {
+                baseWaterColor: new Cesium.Color(0.1, 0.3, 0.5, 0.9),
+                normalMap: '../Apps/SampleData/waterNormals.png',
+                frequency: 200.0,
+                animationSpeed: 0.05,
+                amplitude: 15.0,
+                specularIntensity: 3.0
+              }
+            }
+          }),
+          aboveGround: true
+        }),
+        asynchronous: false
       });
+    }
 
-      // 照片墙数据与创建函数
-      const images = [
-        { name: 'Train Station', path: "./Apps/SampleData/2024trainstation.png", lon: 113.0057506, lat: 28.1960111 },
-        { name: 'Orange Island',   path: "./Apps/SampleData/橘子洲头.png",      lon: 112.9545,      lat: 28.1695    },
-        { name: 'Xiyimen',         path: "./Apps/SampleData/喜盈门.png",      lon: 113.0285,      lat: 28.1360    }
-      ];
-      const baseH = 5, wallH = 200, meters = 400, earthR = 6378137.0;
-      function createPhotoWall(lon, lat, img, id) {
-        const dLon = meters / (earthR * Math.cos(Cesium.Math.toRadians(lat))) * (180/Math.PI);
-        const wLon = lon - dLon/2, eLon = lon + dLon/2;
-        const pos = Cesium.Cartesian3.fromDegreesArrayHeights([
-          wLon, lat, baseH, eLon, lat, baseH
-        ]);
-        viewer.entities.add({
-          name: id,
-          wall: {
-            positions: pos,
-            minimumHeights: [baseH, baseH],
-            maximumHeights: [baseH+wallH, baseH+wallH],
-            material: new Cesium.ImageMaterialProperty({
-              image: img,
-              repeat: new Cesium.Cartesian2(1,1),
-              transparent: true
-            })
-          }
-        });
+    function onSliderChange(value) {
+      const index = parseInt(value);
+      document.getElementById('timeLabel').textContent = dataFiles[index].label;
+
+      if (autoPlayTimer) {
+        clearInterval(autoPlayTimer);
+        autoPlayTimer = null;
+        isPlaying = false;
+        document.getElementById('playButton').textContent = '▶';
       }
-      // 检测并创建
-      images.forEach(o => {
-        const tester = new Image();
-        tester.src     = o.path;
-        createPhotoWall(o.lon, o.lat, o.path, o.name);
-      });
 
-      // 加载初始预测 GeoJSON
-      loadGeoJSON('output.geojson');
-    }
-
-    // GeoJSON 加载 和 切换
-    function loadGeoJSON(file) {
-      if (currentDataSource) {
-        viewer.dataSources.remove(currentDataSource);
+      if (index === 2 && !isPlaying) {
+        startAutoPlay();
+      } else {
+        loadAndFade(dataFiles[index].file);
       }
-      Cesium.GeoJsonDataSource.load("./Apps/SampleData/" + file)
-        .then(ds => {
-          currentDataSource = ds;
-          viewer.dataSources.add(ds);
-        })
-        .catch(err => console.error('加载GeoJSON失败:', err));
     }
-    function switchData() {
-      const sel = document.getElementById('yearSelector');
-      loadGeoJSON(sel.value);
+
+    function startAutoPlay() {
+      isPlaying = true;
+      document.getElementById('playButton').textContent = '⏸';
+      let currentMonth = 2;
+
+      autoPlayTimer = setInterval(() => {
+        if (currentMonth > 13) {
+          stopAutoPlay();
+          return;
+        }
+
+        document.getElementById('timeSlider').value = currentMonth;
+        document.getElementById('timeLabel').textContent = dataFiles[currentMonth].label;
+        loadAndFade(dataFiles[currentMonth].file);
+        currentMonth++;
+      }, playInterval);
     }
+
+    function stopAutoPlay() {
+      clearInterval(autoPlayTimer);
+      autoPlayTimer = null;
+      isPlaying = false;
+      document.getElementById('playButton').textContent = '▶';
+    }
+
+    document.getElementById('playButton').addEventListener('click', () => {
+      if (isPlaying) {
+        stopAutoPlay();
+      } else {
+        const currentValue = parseInt(document.getElementById('timeSlider').value);
+        document.getElementById('timeSlider').value = Math.max(2, currentValue);
+        startAutoPlay();
+      }
+    });
   </script>
 </body>
 </html>

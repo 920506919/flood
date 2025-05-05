@@ -7,9 +7,9 @@
   <title>三维水体可视化系统（时间轴）</title>
 
   <!-- Cesium 依赖 -->
-  <script>window.CESIUM_BASE_URL = '../Build/CesiumUnminified';</script>
-  <link rel="stylesheet" href="../Build/CesiumUnminified/Widgets/widgets.css"/>
-  <script src="../Build/CesiumUnminified/Cesium.js"></script>
+  <script>window.CESIUM_BASE_URL = './Build/CesiumUnminified';</script>
+  <link rel="stylesheet" href="./Build/CesiumUnminified/Widgets/widgets.css"/>
+  <script src="./Build/CesiumUnminified/Cesium.js"></script>
 
   <style>
     html, body {
@@ -146,36 +146,36 @@
 
 // 照片墙数据与函数定义
     const images = [
-      { name: 'Train Station', path: '../Apps/SampleData/2024trainstation.png', lon: 113.0057506, lat: 28.1960111 },
-      { name: 'Orange Island',   path: '../Apps/SampleData/橘子洲.jpg',      lon: 112.9545,      lat: 28.1695    },
-      { name: 'Xiyimen',         path: '../Apps/SampleData/喜盈门.png',      lon: 113.0285,      lat: 28.1360    },
-      { name: 'Orange squer',   path: '../Apps/SampleData/1东方红广场.jpg',      lon: 112.9418,      lat: 28.1794    },
-      { name: '农大',   path: '../Apps/SampleData/1湖南农业大学红旗广场.jpg',      lon: 113.0819,      lat: 28.18128    },
-      { name: 'shidaiyangguang',   path: '../Apps/SampleData/01雨花区时代阳光大道158号.jpg',      lon: 113.02047,      lat: 28.09591   },
-      { name: '金盆岭',   path: '../Apps/SampleData/01长沙理工大学金盆岭校区东苑游泳池.jpg',      lon: 112.9669,      lat: 28.167   },
-      { name: '汽车南站',   path: '../Apps/SampleData/1长沙汽车南站.jpg',      lon: 113.0128,      lat: 28.09722   },
-      { name: '汽车南站1',   path: '../Apps/SampleData/1长沙汽车南站2.jpg',      lon: 113.0100,      lat: 28.09480    },
-      { name: '植物园路',   path: '../Apps/SampleData/1植物园路.jpg',      lon: 113.0217,      lat: 28.10328   },
-      { name: 'xiangya',   path: '../Apps/SampleData/1中南大学湘雅二医院.jpg',      lon: 112.99451,      lat: 28.1879   },
-      { name: 'linkeda',   path: '../Apps/SampleData/1中南林科大.2.jpg',      lon: 112.99480,      lat: 28.13293    },
-      { name: 'linkeda2',   path: '../Apps/SampleData/1中南林科大.jpg',      lon: 112.98954,      lat: 28.12996   },
-      { name: 'fenghuanghai',   path: '../Apps/SampleData/01hi park凤凰海购物公园.jpg',      lon: 112.98096,      lat: 28.23677   },
-      { name: 'datang',   path: '../Apps/SampleData/大塘站.jpg',      lon: 113.03437,      lat: 28.13100   },
-      { name: 'guitanghe',   path: '../Apps/SampleData/圭塘河.jpg',      lon: 113.0321,      lat: 28.13544   },
-      { name: 'hanpu',   path: '../Apps/SampleData/含浦.jpg',      lon: 112.92125,      lat: 28.16256    },
-      { name: 'meixihu',   path: '../Apps/SampleData/梅溪湖.jpg',      lon: 112.89706,      lat: 28.19014    },
-      { name: 'shewai2',   path: '../Apps/SampleData/涉外1.jpg',      lon: 112.87553,      lat: 28.24999   },
-      { name: 'shumuling',   path: '../Apps/SampleData/树木岭立交桥.jpg',      lon: 113.01351,      lat: 28.15590   },
-      { name: 'tiedaoxueyuan',   path: '../Apps/SampleData/铁道学院.jpg',      lon: 112.99024,      lat: 28.13970   },
-      { name: 'yuhuaquzhengfu',   path: '../Apps/SampleData/万家丽路口.jpg',      lon: 113.03309,      lat: 28.13752   },
-      { name: 'xiyuehui',   path: '../Apps/SampleData/溪悦荟.jpg',      lon: 113.02886,      lat: 28.14444   },
-      { name: 'youyouxiaozheng',   path: '../Apps/SampleData/悠游小镇.jpg',      lon: 113.03262,      lat: 28.13006   },
-      { name: 'bingjianggongyuan',   path: '../Apps/SampleData/长沙春晚舞台.jpg',      lon: 112.97749,      lat: 28.24175   },
-      { name: 'huochezhan',   path: '../Apps/SampleData/长沙火车站.jpg',      lon: 113.00900,      lat: 28.19530   },
-      { name: 'zhongnan',   path: '../Apps/SampleData/中南大1.jpg',      lon: 112.92464,      lat: 28.16772   },
-      { name: 'zhongnan1',   path: '../Apps/SampleData/中南大学.jpg',      lon: 112.92796,      lat: 28.17211   },
-      { name: 'zhongnan2',   path: '../Apps/SampleData/中南大学2.jpg',      lon: 112.93475,      lat: 28.16021   },
-      { name: 'zhongnan3',   path: '../Apps/SampleData/中南大学3.jpg',      lon: 112.93774,      lat: 28.15048   }
+      { name: 'Train Station', path: './Apps/SampleData/2024trainstation.png', lon: 113.0057506, lat: 28.1960111 },
+      { name: 'Orange Island',   path: './Apps/SampleData/橘子洲.jpg',      lon: 112.9545,      lat: 28.1695    },
+      { name: 'Xiyimen',         path: './Apps/SampleData/喜盈门.png',      lon: 113.0285,      lat: 28.1360    },
+      { name: 'Orange squer',   path: './Apps/SampleData/1东方红广场.jpg',      lon: 112.9418,      lat: 28.1794    },
+      { name: '农大',   path: './Apps/SampleData/1湖南农业大学红旗广场.jpg',      lon: 113.0819,      lat: 28.18128    },
+      { name: 'shidaiyangguang',   path: './Apps/SampleData/01雨花区时代阳光大道158号.jpg',      lon: 113.02047,      lat: 28.09591   },
+      { name: '金盆岭',   path: './Apps/SampleData/01长沙理工大学金盆岭校区东苑游泳池.jpg',      lon: 112.9669,      lat: 28.167   },
+      { name: '汽车南站',   path: './Apps/SampleData/1长沙汽车南站.jpg',      lon: 113.0128,      lat: 28.09722   },
+      { name: '汽车南站1',   path: './Apps/SampleData/1长沙汽车南站2.jpg',      lon: 113.0100,      lat: 28.09480    },
+      { name: '植物园路',   path: './Apps/SampleData/1植物园路.jpg',      lon: 113.0217,      lat: 28.10328   },
+      { name: 'xiangya',   path: './Apps/SampleData/1中南大学湘雅二医院.jpg',      lon: 112.99451,      lat: 28.1879   },
+      { name: 'linkeda',   path: './Apps/SampleData/1中南林科大.2.jpg',      lon: 112.99480,      lat: 28.13293    },
+      { name: 'linkeda2',   path: './Apps/SampleData/1中南林科大.jpg',      lon: 112.98954,      lat: 28.12996   },
+      { name: 'fenghuanghai',   path: './Apps/SampleData/01hi park凤凰海购物公园.jpg',      lon: 112.98096,      lat: 28.23677   },
+      { name: 'datang',   path: './Apps/SampleData/大塘站.jpg',      lon: 113.03437,      lat: 28.13100   },
+      { name: 'guitanghe',   path: './Apps/SampleData/圭塘河.jpg',      lon: 113.0321,      lat: 28.13544   },
+      { name: 'hanpu',   path: './Apps/SampleData/含浦.jpg',      lon: 112.92125,      lat: 28.16256    },
+      { name: 'meixihu',   path: './Apps/SampleData/梅溪湖.jpg',      lon: 112.89706,      lat: 28.19014    },
+      { name: 'shewai2',   path: './Apps/SampleData/涉外1.jpg',      lon: 112.87553,      lat: 28.24999   },
+      { name: 'shumuling',   path: './Apps/SampleData/树木岭立交桥.jpg',      lon: 113.01351,      lat: 28.15590   },
+      { name: 'tiedaoxueyuan',   path: './Apps/SampleData/铁道学院.jpg',      lon: 112.99024,      lat: 28.13970   },
+      { name: 'yuhuaquzhengfu',   path: './Apps/SampleData/万家丽路口.jpg',      lon: 113.03309,      lat: 28.13752   },
+      { name: 'xiyuehui',   path: './Apps/SampleData/溪悦荟.jpg',      lon: 113.02886,      lat: 28.14444   },
+      { name: 'youyouxiaozheng',   path: './Apps/SampleData/悠游小镇.jpg',      lon: 113.03262,      lat: 28.13006   },
+      { name: 'bingjianggongyuan',   path: './Apps/SampleData/长沙春晚舞台.jpg',      lon: 112.97749,      lat: 28.24175   },
+      { name: 'huochezhan',   path: './Apps/SampleData/长沙火车站.jpg',      lon: 113.00900,      lat: 28.19530   },
+      { name: 'zhongnan',   path: './Apps/SampleData/中南大1.jpg',      lon: 112.92464,      lat: 28.16772   },
+      { name: 'zhongnan1',   path: './Apps/SampleData/中南大学.jpg',      lon: 112.92796,      lat: 28.17211   },
+      { name: 'zhongnan2',   path: './Apps/SampleData/中南大学2.jpg',      lon: 112.93475,      lat: 28.16021   },
+      { name: 'zhongnan3',   path: './Apps/SampleData/中南大学3.jpg',      lon: 112.93774,      lat: 28.15048   }
     ];
     const baseH = 10, wallH = 300, meters = 500, earthR = 6378137.0;
     function createPhotoWall(lon, lat, img, id) {
@@ -297,7 +297,7 @@
     // 其余函数保持不变（loadAndFade, createWaterPrimitive, onSliderChange等）
     async function loadAndFade(filename) {
       try {
-        const response = await fetch(`../Apps/SampleData/${filename}`);
+        const response = await fetch(`./Apps/SampleData/${filename}`);
         const geojson = await response.json();
         
         const newPrim = createWaterPrimitive(geojson);
@@ -366,7 +366,7 @@
               type: 'Water',
               uniforms: {
                 baseWaterColor: new Cesium.Color(0.1, 0.3, 0.5, 0.9),
-                normalMap: '../Apps/SampleData/waterNormals.png',
+                normalMap: './Apps/SampleData/waterNormals.png',
                 frequency: 200.0,
                 animationSpeed: 0.05,
                 amplitude: 15.0,
